@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小白的混沌空间(๑❛ᴗ❛๑)</title>
+  <style>
+    :root{
+      --bg:#f8f8ff;
+      --bg2:#f4f5fb;
+      --card:#ffffff;
+      --text:#1f2430;
+      --muted:#667085;
+      --line:#e7eaf0;
+      --accent:#ff8fb1;
+      --accent2:#ffc0cb;
+      --shadow:0 10px 30px rgba(39,45,77,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text)}
+    .wrap{max-width:1100px;margin:0 auto;padding:32px 18px 60px}
+    .hero{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:28px;padding:28px 22px;box-shadow:var(--shadow);cursor:pointer;user-select:none}
+    .hero h1{margin:0 0 8px;font-size:30px;line-height:1.2}
+    .hero p{margin:0;opacity:.95;line-height:1.7}
+    .hero-hint{margin-top:10px;font-size:13px;opacity:.92}
+    .toolbar{margin-top:18px;display:grid;grid-template-columns:1.3fr .8fr auto auto;gap:12px;align-items:center}
+    input,select,textarea,button{font:inherit}
+    .input,.select,.textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:14px 16px;outline:none;transition:.2s border,.2s box-shadow;color:var(--text)}
+    .input:focus,.select:focus,.textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,143,177,.16)}
+    .btn{border:none;border-radius:14px;padding:14px 18px;cursor:pointer;background:var(--accent);color:white;font-weight:600;box-shadow:var(--shadow);transition:transform .06s ease, opacity .2s ease;white-space:nowrap}
+    .btn:hover{opacity:.96}.btn:active{transform:translateY(1px)}
+    .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line);box-shadow:none}
+    .btn.danger{background:#fff0f3;color:#b4234d;border:1px solid #ffd0dc;box-shadow:none}
+    .section{margin-top:22px;display:grid;grid-template-columns:1.3fr .8fr;gap:20px}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);min-height:420px}
+    .panel-header{padding:18px 18px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .panel-header h2{margin:0;font-size:18px}
+    .panel-body{padding:16px 18px 18px}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+    .chip{border:1px solid var(--line);background:#fafaff;color:#475467;border-radius:999px;padding:9px 13px;cursor:pointer;user-select:none;transition:.2s}
+    .chip.active{background:rgba(255,143,177,.14);border-color:rgba(255,143,177,.34);color:#d6336c;font-weight:600}
+    .count,.small,.muted{color:var(--muted);font-size:14px}
+    .results{display:grid;gap:12px}
+    .card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff;transition:.2s transform,.2s box-shadow,.2s border;cursor:pointer}
+    .card:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(39,45,77,.06);border-color:#d7dbeb}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .tag{font-size:12px;padding:5px 9px;border-radius:999px;background:#f3f4f8;color:#4b5565}
+    .card h3,.detail-title{margin:0 0 8px;font-size:18px}
+    .detail-title{font-size:24px;margin-bottom:14px}
+    .card p,.detail-content{margin:0;color:#4b5565;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+    .detail-toolbar,.editor-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .form-grid{display:grid;gap:12px}
+    .empty{padding:18px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;background:#fcfcff}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .footer{margin-top:20px;text-align:center;color:var(--muted);font-size:13px}
+    .upload-box{border:1px dashed var(--line);border-radius:14px;padding:12px;background:#fffafb}
+    .attachment-preview,.trash-list,.detail-attachments{display:grid;gap:10px;margin-top:10px}
+    .attachment-item,.trash-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .attachment-name,.trash-name{font-size:14px;color:var(--text);word-break:break-all}
+    .attachment-remove{border:none;background:#ffe7ef;color:#b4234d;border-radius:999px;padding:6px 10px;cursor:pointer}
+    .detail-image{max-width:100%;border-radius:14px;border:1px solid var(--line);display:block;background:#fff}
+    .file-link{display:inline-block;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fffafb;color:var(--text);text-decoration:none}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(31,36,48,.28);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(760px,100%);max-height:82vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(31,36,48,.18);border:1px solid var(--line)}
+    .modal-header{padding:18px 20px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;background:#fff}
+    .modal-header h3{margin:0;font-size:20px}
+    .modal-body{padding:16px 20px 20px}
+    .trash-meta{font-size:13px;color:var(--muted);margin-top:4px}
+    .toolbar-note{font-size:13px;color:var(--muted);text-align:right}
+
+    .section.focus-mode{
+      grid-template-columns:1fr !important;
+    }
+    .section.focus-mode .panel:first-child{
+      display:none !important;
+    }
+    .section.focus-mode .panel:last-child{
+      grid-column:1 / -1 !important;
+      width:100% !important;
+      max-width:none !important;
+    }
+    .section.focus-mode .panel-header h2{
+      font-size:28px;
+    }
+    .section.focus-mode .panel-body{
+      padding:24px 26px 30px;
+    }
+    .section.focus-mode .detail-title{
+      font-size:30px;
+    }
+    .section.focus-mode .detail-content{
+      font-size:20px;
+      line-height:2.05;
+    }
+
+    @media (max-width:900px){.toolbar,.section{grid-template-columns:1fr}.panel{min-height:auto}.toolbar-note{text-align:left}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero" id="homeHero" title="点这里返回主页">
+      <h1>小白的混沌空间(๑❛ᴗ❛๑)</h1>
+      <p>这里是小白独家搜索引擎꒰՞´●᷄.𖥦●᷄`՞꒱ 输入关键词，就能找到你想要的内容咯！</p>
+      <div class="hero-hint">点这里可以随时返回主页喔 ✨</div>
+    </div>
+
+    <div class="toolbar">
+      <input id="searchInput" class="input" type="text" placeholder="搜索关键词，比如：法语、食谱、邮件格式、影视推荐.." />
+      <select id="categorySelect" class="select">
+        <option value="全部">全部分类</option>
+      </select>
+      <button id="newBtn" class="btn">新增内容</button>
+      <button id="trashBtn" class="btn secondary">最近删除</button>
+    </div>
+
+    <div class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>搜索结果</h2>
+          <div class="toolbar-note" id="searchStateNote"></div>
+        </div>
+        <div class="panel-body">
+          <div id="chips" class="chips"></div>
+          <div id="count" class="count"></div>
+          <div id="results" class="results"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2 id="sideTitle">详情</h2>
+        </div>
+        <div class="panel-body">
+          <div id="detailView">
+            <div class="empty">点左边一条内容，就会在这里显示详细内容喔。</div>
+          </div>
+
+          <div id="editor" style="display:none;">
+            <div class="editor-toolbar">
+              <div class="small">编辑完成后点保存就好。</div>
+              <button id="backHomeFromEditorBtn" class="btn secondary" type="button">返回主页</button>
+            </div>
+            <div class="form-grid">
+              <input id="titleInput" class="input" type="text" placeholder="标题" />
+              <input id="categoryInput" class="input" type="text" placeholder="分类，比如：法语 / EAP / 数学 / 生活" />
+              <input id="keywordsInput" class="input" type="text" placeholder="关键词，用逗号分开，比如：成都, presentation, 法语" />
+              <textarea id="contentInput" class="textarea" rows="10" placeholder="内容"></textarea>
+              <div class="upload-box">
+                <label class="small" for="attachmentInput">添加图片或文件</label>
+                <input id="attachmentInput" class="input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar" />
+                <div id="attachmentPreview" class="attachment-preview"></div>
+              </div>
+            </div>
+            <div class="actions">
+              <button id="saveBtn" class="btn">保存</button>
+              <button id="cancelBtn" class="btn secondary">取消</button>
+            </div>
+            <div class="small" style="margin-top:10px;">保存后会自动存在当前浏览器里。本地打开和 GitHub Pages 都可以继续用。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">单文件网站 · 可直接本地打开使用</div>
+  </div>
+
+  <div class="modal-backdrop" id="trashModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>最近删除</h3>
+        <button id="closeTrashBtn" class="btn secondary" type="button">关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="small">已删除的内容会在这里保留 15 天，之后自动清除。</div>
+        <div id="trashList" class="trash-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "xiaobai-internetspace-v2";
+    const TRASH_KEY = "xiaobai-internetspace-trash-v2";
+    const LEGACY_KEYS = ["guaiguai-search-site-v1", "xiaobai-chaos-space-v2"];
+    const TRASH_EXPIRE_MS = 15 * 24 * 60 * 60 * 1000;
+
+    const LEGACY_SAMPLE_SIGNATURES = [
+      { title:"成都 presentation 法语开头", category:"法语" },
+      { title:"B2B essay 结构", category:"EAP" },
+      { title:"z test 基本步骤", category:"数学" },
+      { title:"给老师发邮件模板", category:"邮件" },
+    ];
+
+    let items = loadItems();
+    let trashItems = loadTrash();
+    let currentCategory = "全部";
+    let editingId = null;
+    let currentAttachments = [];
+
+    const searchInput = document.getElementById("searchInput");
+    const categorySelect = document.getElementById("categorySelect");
+    const chips = document.getElementById("chips");
+    const count = document.getElementById("count");
+    const results = document.getElementById("results");
+    const detailView = document.getElementById("detailView");
+    const editor = document.getElementById("editor");
+    const sideTitle = document.getElementById("sideTitle");
+    const searchStateNote = document.getElementById("searchStateNote");
+    const sectionEl = document.querySelector(".section");
+
+    const titleInput = document.getElementById("titleInput");
+    const categoryInput = document.getElementById("categoryInput");
+    const keywordsInput = document.getElementById("keywordsInput");
+    const contentInput = document.getElementById("contentInput");
+    const attachmentInput = document.getElementById("attachmentInput");
+    const attachmentPreview = document.getElementById("attachmentPreview");
+
+    const trashModal = document.getElementById("trashModal");
+    const trashList = document.getElementById("trashList");
+
+
+    function enterFocusMode(){
+      sectionEl.classList.add("focus-mode");
+    }
+
+    function exitFocusMode(){
+      sectionEl.classList.remove("focus-mode");
+    }
+
+    function normalize(text){
+      return (text || "").toLowerCase().trim();
+    }
+
+    function makeId(){
+      return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
+    function isLegacySample(item){
+      return LEGACY_SAMPLE_SIGNATURES.some(s => item.title === s.title && item.category === s.category);
+    }
+
+    function purgeExpiredTrash(){
+      const now = Date.now();
+      trashItems = trashItems.filter(item => now - (item.deletedAt || now) < TRASH_EXPIRE_MS);
+      saveTrash();
+    }
+
+    function loadItems(){
+      const currentRaw = localStorage.getItem(STORAGE_KEY);
+      if(currentRaw){
+        try{ return JSON.parse(currentRaw); }catch{}
+      }
+
+      for(const key of LEGACY_KEYS){
+        const raw = localStorage.getItem(key);
+        if(!raw) continue;
+        try{
+          const parsed = JSON.parse(raw);
+          const migrated = Array.isArray(parsed) ? parsed.filter(item => !isLegacySample(item)) : [];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }catch{}
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      return [];
+    }
+
+    function loadTrash(){
+      const raw = localStorage.getItem(TRASH_KEY);
+      if(!raw){
+        localStorage.setItem(TRASH_KEY, JSON.stringify([]));
+        return [];
+      }
+      try{ return JSON.parse(raw); }
+      catch{
+        localStorage.setItem(TRASH_KEY, JSON.stringify([]));
+        return [];
+      }
+    }
+
+    function saveItems(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+    function saveTrash(){ localStorage.setItem(TRASH_KEY, JSON.stringify(trashItems)); }
+
+    function getCategories(){
+      return ["全部", ...new Set(items.map(i => i.category).filter(Boolean))];
+    }
+
+    function updateCategoryUI(){
+      const categories = getCategories();
+      categorySelect.innerHTML = categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c === "全部" ? "全部分类" : c)}</option>`).join("");
+      categorySelect.value = currentCategory;
+
+      chips.innerHTML = categories.map(c => `
+        <button class="chip ${c === currentCategory ? "active" : ""}" data-category="${escapeAttr(c)}">${escapeHtml(c)}</button>
+      `).join("");
+
+      chips.querySelectorAll(".chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentCategory = btn.dataset.category;
+          categorySelect.value = currentCategory;
+          detailView.innerHTML = `<div class="empty">点左边一条内容，就会在这里显示详细内容喔。</div>`;
+          sideTitle.textContent = "详情";
+          render();
+        });
+      });
+    }
+
+    function filterItems(){
+      const q = normalize(searchInput.value);
+      return items.filter(item => {
+        const inCategory = currentCategory === "全部" || item.category === currentCategory;
+        if(!inCategory) return false;
+        if(!q) return true;
+        const hay = [item.title, item.category, item.content, ...(item.keywords || [])].join(" ").toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    function renderSearchState(){
+      const q = searchInput.value.trim();
+      if(q || currentCategory !== "全部"){
+        const parts = [];
+        if(q) parts.push(`关键词：${q}`);
+        if(currentCategory !== "全部") parts.push(`分类：${currentCategory}`);
+        searchStateNote.textContent = `已筛选 · ${parts.join(" / ")}`;
+      }else{
+        searchStateNote.textContent = "点上方粉色区域可返回主页";
+      }
+    }
+
+    function render(){
+      purgeExpiredTrash();
+      updateCategoryUI();
+      renderSearchState();
+
+      const filtered = filterItems();
+      count.textContent = `共 ${filtered.length} 条内容`;
+      results.innerHTML = "";
+
+      if(!filtered.length){
+        results.innerHTML = `<div class="empty">没有搜到结果诶..试试换个关键词，或者新增一条内容呀。</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="meta">
+            <span class="tag">${escapeHtml(item.category || "未分类")}</span>
+            ${(item.keywords || []).slice(0,4).map(k => `<span class="tag">${escapeHtml(k)}</span>`).join("")}
+          </div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(getPreview(item.content, 130))}</p>
+        `;
+        card.addEventListener("click", () => showDetail(item.id));
+        results.appendChild(card);
+      });
+    }
+
+    function resetHome(){
+      exitFocusMode();
+      searchInput.value = "";
+      currentCategory = "全部";
+      editingId = null;
+      currentAttachments = [];
+      if(attachmentInput) attachmentInput.value = "";
+      editor.style.display = "none";
+      detailView.style.display = "block";
+      sideTitle.textContent = "详情";
+      detailView.innerHTML = `<div class="empty">点左边一条内容，就会在这里显示详细内容喔。</div>`;
+      render();
+    }
+
+    function showDetail(id){
+      const item = items.find(x => x.id === id);
+      if(!item) return;
+      enterFocusMode();
+      editor.style.display = "none";
+      detailView.style.display = "block";
+      sideTitle.textContent = "详情";
+
+      const attachmentsHtml = (item.attachments || []).map(file => {
+        const isImage = file.type && file.type.startsWith("image/");
+        if(isImage){
+          return `<img class="detail-image" src="${file.data}" alt="${escapeHtml(file.name)}" />`;
+        }
+        return `<a class="file-link" href="${file.data}" download="${escapeHtml(file.name)}">📎 ${escapeHtml(file.name)}</a>`;
+      }).join("");
+
+      detailView.innerHTML = `
+        <div class="detail-toolbar">
+          <button class="btn secondary" id="goHomeFromDetailBtn">返回主页</button>
+          <div class="small">也可以直接点上面粉色区域返回主页</div>
+        </div>
+        <div class="meta">
+          <span class="tag">${escapeHtml(item.category || "未分类")}</span>
+          ${(item.keywords || []).map(k => `<span class="tag">${escapeHtml(k)}</span>`).join("")}
+        </div>
+        <h3 class="detail-title">${escapeHtml(item.title)}</h3>
+        <div class="detail-content">${escapeHtml(item.content)}</div>
+        <div class="detail-attachments">${attachmentsHtml}</div>
+        <div class="actions">
+          <button class="btn" id="editThisBtn">编辑</button>
+          <button class="btn danger" id="deleteThisBtn">删除</button>
+        </div>
+      `;
+
+      document.getElementById("goHomeFromDetailBtn").addEventListener("click", resetHome);
+      document.getElementById("editThisBtn").addEventListener("click", () => openEditor(item.id));
+      document.getElementById("deleteThisBtn").addEventListener("click", () => deleteItem(item.id));
+    }
+
+    function openEditor(id = null){
+      enterFocusMode();
+      editingId = id;
+      sideTitle.textContent = id ? "编辑内容" : "新增内容";
+      detailView.style.display = "none";
+      editor.style.display = "block";
+
+      if(id){
+        const item = items.find(x => x.id === id);
+        titleInput.value = item?.title || "";
+        categoryInput.value = item?.category || "";
+        keywordsInput.value = (item?.keywords || []).join(", ");
+        contentInput.value = item?.content || "";
+        currentAttachments = [...(item?.attachments || [])];
+      }else{
+        titleInput.value = "";
+        categoryInput.value = "";
+        keywordsInput.value = "";
+        contentInput.value = "";
+        currentAttachments = [];
+      }
+
+      if(attachmentInput) attachmentInput.value = "";
+      renderAttachmentPreview();
+    }
+
+    function renderAttachmentPreview(){
+      attachmentPreview.innerHTML = "";
+      if(!currentAttachments.length){
+        attachmentPreview.innerHTML = `<div class="small">暂时还没有附件喔。</div>`;
+        return;
+      }
+      currentAttachments.forEach((file, index) => {
+        const div = document.createElement("div");
+        div.className = "attachment-item";
+        div.innerHTML = `
+          <div class="attachment-name">${escapeHtml(file.name)}</div>
+          <button class="attachment-remove" type="button" data-index="${index}">删除</button>
+        `;
+        div.querySelector(".attachment-remove").addEventListener("click", () => {
+          currentAttachments.splice(index, 1);
+          renderAttachmentPreview();
+        });
+        attachmentPreview.appendChild(div);
+      });
+    }
+
+    function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function saveCurrent(){
+      const title = titleInput.value.trim();
+      const category = categoryInput.value.trim() || "未分类";
+      const keywords = keywordsInput.value.split(",").map(x => x.trim()).filter(Boolean);
+      const content = contentInput.value.trim();
+
+      if(!title || !content){
+        alert("标题和内容不能空着喔！");
+        return;
+      }
+
+      if(attachmentInput && attachmentInput.files && attachmentInput.files.length){
+        const newFiles = await Promise.all([...attachmentInput.files].map(async file => ({
+          name: file.name,
+          type: file.type,
+          data: await fileToDataUrl(file)
+        })));
+        currentAttachments = [...currentAttachments, ...newFiles];
+        attachmentInput.value = "";
+      }
+
+      if(editingId){
+        items = items.map(item => item.id === editingId ? {...item, title, category, keywords, content, attachments: currentAttachments} : item);
+      }else{
+        items.unshift({ id: makeId(), title, category, keywords, content, attachments: currentAttachments });
+      }
+
+      saveItems();
+      editingId = null;
+      currentAttachments = [];
+      render();
+      resetHome();
+    }
+
+    function deleteItem(id){
+      const item = items.find(x => x.id === id);
+      if(!item) return;
+      if(!confirm("确定要删除这条内容嘛？它会进入最近删除，15 天内都可以恢复。")) return;
+
+      trashItems.unshift({ ...item, trashId: makeId(), deletedAt: Date.now() });
+      items = items.filter(x => x.id !== id);
+
+      saveItems();
+      saveTrash();
+      resetHome();
+    }
+
+    function openTrash(){ purgeExpiredTrash(); renderTrash(); trashModal.classList.add("show"); }
+    function closeTrash(){ trashModal.classList.remove("show"); }
+
+    function restoreTrashItem(trashId){
+      const item = trashItems.find(x => x.trashId === trashId);
+      if(!item) return;
+      const restored = {...item};
+      delete restored.trashId;
+      delete restored.deletedAt;
+
+      items.unshift(restored);
+      trashItems = trashItems.filter(x => x.trashId !== trashId);
+      saveItems();
+      saveTrash();
+      render();
+      renderTrash();
+    }
+
+    function clearTrashItem(trashId){
+      trashItems = trashItems.filter(x => x.trashId !== trashId);
+      saveTrash();
+      renderTrash();
+    }
+
+    function renderTrash(){
+      trashList.innerHTML = "";
+      if(!trashItems.length){
+        trashList.innerHTML = `<div class="empty">最近删除还是空的喔。</div>`;
+        return;
+      }
+
+      trashItems.forEach(item => {
+        const remainMs = Math.max(0, TRASH_EXPIRE_MS - (Date.now() - (item.deletedAt || Date.now())));
+        const remainDays = Math.ceil(remainMs / (24 * 60 * 60 * 1000));
+
+        const div = document.createElement("div");
+        div.className = "trash-item";
+        div.innerHTML = `
+          <div>
+            <div class="trash-name">${escapeHtml(item.title)}</div>
+            <div class="trash-meta">还会保留 ${remainDays} 天</div>
+          </div>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn secondary restore-btn" type="button">恢复</button>
+            <button class="btn danger clear-btn" type="button">清除</button>
+          </div>
+        `;
+        div.querySelector(".restore-btn").addEventListener("click", () => restoreTrashItem(item.trashId));
+        div.querySelector(".clear-btn").addEventListener("click", () => clearTrashItem(item.trashId));
+        trashList.appendChild(div);
+      });
+    }
+
+    function getPreview(text, max){ return text.length > max ? text.slice(0, max) + "..." : text; }
+    function escapeHtml(str){ return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;"); }
+    function escapeAttr(str){ return escapeHtml(str); }
+
+    document.getElementById("homeHero").addEventListener("click", resetHome);
+    document.getElementById("newBtn").addEventListener("click", () => openEditor());
+    document.getElementById("trashBtn").addEventListener("click", openTrash);
+    document.getElementById("closeTrashBtn").addEventListener("click", closeTrash);
+    trashModal.addEventListener("click", (e) => { if(e.target === trashModal) closeTrash(); });
+
+    document.getElementById("backHomeFromEditorBtn").addEventListener("click", resetHome);
+    document.getElementById("saveBtn").addEventListener("click", saveCurrent);
+    document.getElementById("cancelBtn").addEventListener("click", resetHome);
+
+    if(attachmentInput){
+      attachmentInput.addEventListener("change", async () => {
+        const files = [...attachmentInput.files];
+        if(!files.length) return;
+        const converted = await Promise.all(files.map(async file => ({ name:file.name, type:file.type, data:await fileToDataUrl(file) })));
+        currentAttachments = [...currentAttachments, ...converted];
+        attachmentInput.value = "";
+        renderAttachmentPreview();
+      });
+    }
+
+    searchInput.addEventListener("input", () => {
+      exitFocusMode();
+      detailView.innerHTML = `<div class="empty">点左边一条内容，就会在这里显示详细内容喔。</div>`;
+      sideTitle.textContent = "详情";
+      render();
+    });
+
+    categorySelect.addEventListener("change", (e) => {
+      exitFocusMode();
+      currentCategory = e.target.value;
+      detailView.innerHTML = `<div class="empty">点左边一条内容，就会在这里显示详细内容喔。</div>`;
+      sideTitle.textContent = "详情";
+      render();
+    });
+
+    purgeExpiredTrash();
+    renderAttachmentPreview();
+    render();
+  </script>
+</body>
+</html>
